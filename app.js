@@ -30,26 +30,30 @@ app.get('/', function(req,res){
   git = req.query.git;
   if (git)
   {
-    r = repo(git,function(rep,readme){
+    r = repo(git,function(rep,readme) {
+      console.log(rep);
       marked.setOptions({
-  gfm: true,
-  highlight: function (code, lang, callback) {
-    pygmentize({ lang: lang, format: 'html' }, code, function (err, result) {
-      if (err) return callback(err);
-      callback(null, result.toString());
-    });
-  },
-  tables: true,
-  breaks: false,
-  pedantic: false,
-  sanitize: true,
-  smartLists: true,
-  smartypants: false,
-  langPrefix: 'lang-'
-});
+        gfm: true,
+        highlight: function (code, lang, callback) {
+        pygmentize({ lang: lang, format: 'html' }, code, function (err, result) {
+          if (err) return callback(err);
+            callback(null, result.toString());
+          });
+        },
+        tables: true,
+        breaks: false,
+        pedantic: false,
+        sanitize: true,
+        smartLists: true,
+        smartypants: false,
+        langPrefix: 'lang-'
+      });
+
       html = marked(readme);
+      screenshot = "https://raw.github.com/"+rep.full_name+"/"+rep.default_branch+"/screenshot.png";
+      console.log(screenshot);
       // now get the README.md as well as the mandatory manifest.yml
-      res.render('index',{title:'Driblet',git:git,name:rep.name,description:rep.description,readme:html});
+      res.render('index',{title:'Driblet',git:git,name:rep.name,description:rep.description,readme:html,screenshot:screenshot});
     }); 
   }
   else
@@ -101,6 +105,8 @@ function repo(url,callback) {
         content = body2.content;
         // this has to be decoded
         callback(body,base64.decode(content));
+
+
   /*
       var readmeContentUrl = 'https://api.github.com/repos/' + user + '/' + repo+'/contents/'+readme_path;
 
