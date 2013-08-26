@@ -1,0 +1,8 @@
+---
+applications:
+- name: driblet
+  memory: 128M
+  instances: 1
+  host: driblet
+  domain: cfapps.io
+  path: .
