@@ -5,7 +5,6 @@
 
 var express = require('express')
    , http = require('http')
-   , base64 = require('base64')
    , marked = require('marked')
    , request = require('request')
    , path = require('path');
@@ -119,7 +118,7 @@ function repo(url,callback) {
       function (err2, response2, body2) 
       {
         content = body2.content;
-        readme = base64.decode(content);      
+        readme = new Buffer(content, 'base64').toString('ascii');      
         var appjsUrl = 'https://api.github.com/repos/' + user + '/' + repo+'/contents/app.js';
 
         request.get(appjsUrl, {
@@ -133,7 +132,7 @@ function repo(url,callback) {
         function (err3, response3, body3) 
         {
           content = body3.content;
-          appjs = base64.decode(content);
+          appjs = new Buffer(content, 'base64').toString('ascii');
 
           var indexejsUrl = 'https://api.github.com/repos/' + user + '/' + repo+'/contents/views/index.ejs';    
           request.get(indexejsUrl, {
@@ -147,7 +146,7 @@ function repo(url,callback) {
           function (err4, response4, body4) 
           {
             content = body4.content;
-            indexejs = base64.decode(content);
+            indexejs = new Buffer(content, 'base64').toString('ascii');
 
             var manifestUrl = 'https://api.github.com/repos/' + user + '/' + repo+'/contents/manifest.yml';
             request.get(manifestUrl, {
@@ -161,7 +160,7 @@ function repo(url,callback) {
             function (err5, response5, body5) 
             {
               content = body5.content;
-              manifest = base64.decode(content);
+              manifest = new Buffer(content, 'base64').toString('ascii');
               callback(body,readme,appjs,indexejs,manifest);
             }); // 5
           }); // 4
