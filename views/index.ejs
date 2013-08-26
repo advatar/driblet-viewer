@@ -6,16 +6,14 @@
     <meta http-equiv="content-type" content="text/html;charset=utf-8">
     <title><%=title%></title>
     <link href="stylesheets/bootstrap.min.css" rel="stylesheet" media="screen">
-    <link rel="stylesheet" href="stylesheets/bootstrap-switch.css">
     <link rel="stylesheet" href="stylesheets/codemirror.css">
   	<script src="javascripts/jquery.min.js"></script>
     <script src="javascripts/bootstrap.min.js"></script>
-    <script src="lib/codemirror.js"></script>
-    <script src="addon/edit/matchbrackets.js"></script>
-    <script src="addon/edit/continuecomment.js"></script>
-    <script src="addon/comment/comment.js"></script>
+    <script src="javascripts/codemirror.js"></script>
+    <script src="javascripts/addon/edit/matchbrackets.js"></script>
+    <script src="javascripts/addon/edit/continuecomment.js"></script>
+    <script src="javascripts/addon/comment/comment.js"></script>
     <script src="javascripts/javascript.js"></script>
-    <script src="javascripts/bootstrap-switch.js"></script>
     <style type="text/css">
       .CodeMirror { border-top: 1px solid black; 
                     border-bottom: 1px solid black;} 
@@ -28,51 +26,49 @@
 	      <h1 class="text-muted"><%=name%></h1>
 	      	<div style="margin-top:10px;padding:5px;position:relative;bottom:5px;">
 	        <button type="button" class="btn btn-default ">RUN</button>&nbsp;<button type="button" class="btn btn-default ">INSTALL</button>&nbsp;              
-	        <div class="make-switch"><input type="checkbox" class="form-group-lg"></div>
 	        </div>
 	    </div>
 	    <div class="row">
-	      <div class="col-md-4">
+	      <div class="col-md-12">
 	          <div class="pull-left">
-	            <a href=http://<%=name%>.cfapps.io><img src=<%=screenshot%>></a>
+	            <a href="<%=homepage%>"><img src=<%=screenshot%>></a>
 	          </div>
 	      </div>
-	      <div class="col-md-6">
+	      <div class="col-md-12">
 	        <fieldset>
 	          <label><%=description%></label>
+	          <div><%=readme%></div>
 	         </fieldset>
 	      </div>
 	    </div>
 	    <div class="row">
-	      <div class="col-md-10 tabbable">
+	      <div class="col-md-12 tabbable">
 	        <ul id="sourceTabs" class="nav nav-tabs" data-tabs="tabs">
-	          <li class="active"><a href="#readme" data-toggle="tab">README</a></li>
-	          <li><a href="#server" data-toggle="tab">Server</a></li>
+	          <li class="active"><a href="#server" data-toggle="tab">Server</a></li>
 	          <li><a href="#client" data-toggle="tab">Client</a></li>
 	          <li><a href="#manifest" data-toggle="tab">Manifest</a></li>
 	          <li><a href="#console" data-toggle="tab">Console</a></li>
 	        </ul>
-	        <div class="tab-content">
-	          <div class="tab-pane active" id="server">
-	            <textarea id="server_code" name="server_code" style="display: none; ">
+	        <div class="tab-content" style="padding:5px">
+          	<div class="tab-pane active" id="server">
+	            <textarea id="server_code" name="server_code" style="display: none; "><%=appjs%>
 	            </textarea>
-	        </div>
-	        <div class="tab-pane" id="client">
-	          <textarea id="client_code" name="client_code" style="display: none; ">
-	          </textarea>
-	        </div>
-	        <div class="tab-pane" id="manifest">
-	          <textarea id="manifest_code" name="manifest_code" style="display: none; ">
-	          </textarea>
-	        </div>
-	        <div class="tab-pane" id="readme">
-	        </div> 
-	      	<div class="tab-pane" id="console">
-	      		CONSOLE OUTPUT
+	        	</div>
+	        	<div class="tab-pane" id="client">
+	          	<textarea id="client_code" name="client_code" style="display: none; "><%=indexejs%>
+	          	</textarea>
+	        	</div>
+	        	<div class="tab-pane" id="manifest">
+	          	<textarea id="manifest_code" name="manifest_code" style="display: none; "><%=manifest%>
+	          	</textarea>
+	        	</div>
+		      	<div class="tab-pane" id="console">
+	      			CONSOLE OUTPUT
+	    			</div>
 	    		</div>
+	  		</div>                    
 	  	</div>                    
 		</div>
-
 <!-- Bootstrap core JavaScript
 ================================================== -->
 <!-- Placed at the end of the document so the pages load faster -->
@@ -80,8 +76,11 @@
 <!-- script type="text/javascript" src="/javascripts/gauge.js"></script-->
 
 <script>
+
   var editor = [];
-  editor["server"] = CodeMirror.fromTextArea(document.getElementById("server_code"), {
+
+
+ 	editor["server"] = CodeMirror.fromTextArea(document.getElementById("server_code"), {
     lineNumbers: true,
     matchBrackets: true,
     continueComments: "Enter",
@@ -101,15 +100,18 @@
     continueComments: "Enter",
     extraKeys: {"Ctrl-Q": "toggleComment"}
   });
+
 </script>
 
   <script>
   $(function () 
   {
-     $('#sourceTabs a:last').tab('show');
+   //  $('#sourceTabs a:last').tab('show');
+    $('#sourceTabs').tab('');
   })
+
+
+
 	</script>
-	<style id="_clearly_component__css" type="text/css">#next_pages_container { width: 5px; hight: 5px; position: absolute; top: -100px; left: -100px; z-index: 2147483647 !important; } 
-	</style>
  </body>
 </html>

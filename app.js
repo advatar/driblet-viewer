@@ -7,6 +7,7 @@ var express = require('express')
    , http = require('http')
    , base64 = require('base64')
    , marked = require('marked')
+   , request = require('request')
    , path = require('path');
 
 var app = express();
@@ -26,12 +27,12 @@ app.configure('development', function(){
   app.use(express.errorHandler());
 });
 
-app.get('/', function(req,res){
+app.get('/', function(req,res) {
   git = req.query.git;
   if (git)
   {
-    r = repo(git,function(rep,readme) {
-      console.log(rep);
+    r = repo(git,function(rep,readme,appjs,indexejs,manifest) {
+      //console.log(rep);
       marked.setOptions({
         gfm: true,
         highlight: function (code, lang, callback) {
@@ -49,23 +50,35 @@ app.get('/', function(req,res){
         langPrefix: 'lang-'
       });
 
+      //html = marked(readme);
+      //console.log(marked(readme));
       html = marked(readme);
       screenshot = "https://raw.github.com/"+rep.full_name+"/"+rep.default_branch+"/screenshot.png";
-      console.log(screenshot);
-      // now get the README.md as well as the mandatory manifest.yml
-      res.render('index',{title:'Driblet',git:git,name:rep.name,description:rep.description,readme:html,screenshot:screenshot});
+      // now get the README.md as well as the mandatory manifest.yml    
+      homepage = rep.homepage ? rep.homepage: "http://"+rep.name+".cfapps.io";
+
+      res.render('index',{
+        title:'Driblet',
+        git:git,
+        name:rep.name,
+        description:rep.description,
+        readme:html,
+        screenshot:screenshot,
+        appjs:appjs,
+        manifest:manifest,
+        indexejs:indexejs,
+        homepage:homepage
+      });
     }); 
   }
   else
     res.render('error',{title:'Error',msg:'Please supply a git url as a querystring, i.e ?url=https://github.com/advatar/bubbles',git:git})
 });
 
-var request = require('request');
 
 function repo(url,callback) {
   var re = /github\.com\/([\w\-\.]+)\/([\w\-\.]+)/i;
   var parsedUrl = re.exec(url.replace(/\.git$/, ''));
-
   // only return components from github for now, later we need to implement gitlab as well
   if (!parsedUrl) {
     console.err("Could not parse a valid github url");
@@ -84,14 +97,17 @@ function repo(url,callback) {
     headers: {
       'User-Agent': 'Node.js'
     }
-  }, function (err, response, body) 
+  }, 
+  function (err, response, body) 
   {
     if (!err && body && /API Rate Limit Exceeded/.test(body.message)) {
       apiLimitExceeded = true;
       console.err('GitHub fetch failed, api limit exceeded\n');
     }
     else if (!err && response.statusCode === 200) {
+
       var readmeUrl = 'https://api.github.com/repos/' + user + '/' + repo+'/readme';
+
       request.get(readmeUrl, {
         json: true,
         qs: {
@@ -103,50 +119,64 @@ function repo(url,callback) {
       function (err2, response2, body2) 
       {
         content = body2.content;
-        // this has to be decoded
-        callback(body,base64.decode(content));
+        readme = base64.decode(content);      
+        var appjsUrl = 'https://api.github.com/repos/' + user + '/' + repo+'/contents/app.js';
 
+        request.get(appjsUrl, {
+          json: true,
+          qs: {
+            client_id: process.env.GITHUB_CLIENT_ID,
+            client_secret: process.env.GITHUB_CLIENT_SECRET
+          },
+          headers: {'User-Agent': 'Node.js'}
+        }, 
+        function (err3, response3, body3) 
+        {
+          content = body3.content;
+          appjs = base64.decode(content);
 
-  /*
-      var readmeContentUrl = 'https://api.github.com/repos/' + user + '/' + repo+'/contents/'+readme_path;
+          var indexejsUrl = 'https://api.github.com/repos/' + user + '/' + repo+'/contents/views/index.ejs';    
+          request.get(indexejsUrl, {
+            json: true,
+            qs: {
+              client_id: process.env.GITHUB_CLIENT_ID,
+              client_secret: process.env.GITHUB_CLIENT_SECRET
+            },
+            headers: {'User-Agent': 'Node.js'}
+          }, 
+          function (err4, response4, body4) 
+          {
+            content = body4.content;
+            indexejs = base64.decode(content);
 
-      console.log(readmeContentUrl);
-
-      request.get(readmeContentUrl, {
-        json: true,
-        qs: {
-          client_id: process.env.GITHUB_CLIENT_ID,
-          client_secret: process.env.GITHUB_CLIENT_SECRET
-        },
-        headers: {'User-Agent': 'Node.js'}
-      }, 
-      function (err3, response3, body3) {
-        console.log("README ",body3);
-
-        callback(body,body3);
-      });
-
-*/
-
-      });    
-  } else {
+            var manifestUrl = 'https://api.github.com/repos/' + user + '/' + repo+'/contents/manifest.yml';
+            request.get(manifestUrl, {
+              json: true,
+              qs: {
+                client_id: process.env.GITHUB_CLIENT_ID,
+                client_secret: process.env.GITHUB_CLIENT_SECRET
+              },
+              headers: {'User-Agent': 'Node.js'}
+            }, 
+            function (err5, response5, body5) 
+            {
+              content = body5.content;
+              manifest = base64.decode(content);
+              callback(body,readme,appjs,indexejs,manifest);
+            }); // 5
+          }); // 4
+        }); // 3
+      }); // 2   
+   } else {
     if (response && response.statusCode === 404) {
-      // uncomment to get a list of registry items pointing
-      // to non-existing repos
-      //console.log(el.name + '\n' + el.url + '\n');
-
-      // don't fail just because the repo doesnt exist
-      // instead just return `undefined` and filter it out later
-      console.err('Ooops got a dreaded 404');
-      deferred.resolve();
+      console.log('Ooops got a dreaded 404');
     } else {
-      console.err('GitHub fetch failed\n' + err + '\n' + body + '\n' + response);
+      console.log('GitHub fetch failed\n');
     }
   }
 });
 
 }
-
 
 http.createServer(app).listen(app.get('port'), function(){
   console.log("Express server listening on port " + app.get('port'));
