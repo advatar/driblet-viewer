@@ -28,7 +28,8 @@
 	      	<div style="margin-top:10px;padding:5px;position:relative;bottom:5px;">
 	    		<% if (edit) { %>
 
-	        <a href="/pushandgo" class="btn btn-default ">RUN</a>
+	        <a href="/pushandgo" class="btn btn-default ">PUSH TO CLOUD</a>
+        &nbsp;<a href="<%=git%>" class="btn btn-default ">VIEW SOURCE</a>
 
 
 	    		<% } else { %>
@@ -53,9 +54,9 @@
 	         </fieldset>
 	      </div>
 	    </div>
-	    <hr>
 	    <% if (edit) { %>
-	    <div class="row" id=push>
+		  <hr>
+    	<div class="row" id=push>
 	      <div class="col-md-12 tabbable">
 	        <ul id="sourceTabs" class="nav nav-tabs" data-tabs="tabs">
 	          <li class="active"><a href="#server" data-toggle="tab">Server</a></li>
