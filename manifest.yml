@@ -6,3 +6,4 @@ applications:
   host: driblet
   domain: cfapps.io
   path: .
+  command: node app.js

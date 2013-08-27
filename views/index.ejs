@@ -1,47 +1,61 @@
-
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
   <head>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="content-type" content="text/html;charset=utf-8">
-    <title><%=title%></title>
-    <link href="stylesheets/bootstrap.min.css" rel="stylesheet" media="screen">
-    <link rel="stylesheet" href="stylesheets/codemirror.css">
-  	<script src="javascripts/jquery.min.js"></script>
-    <script src="javascripts/bootstrap.min.js"></script>
-    <script src="javascripts/codemirror.js"></script>
-    <script src="javascripts/addon/edit/matchbrackets.js"></script>
-    <script src="javascripts/addon/edit/continuecomment.js"></script>
-    <script src="javascripts/addon/comment/comment.js"></script>
-    <script src="javascripts/javascript.js"></script>
+    <title>Driblet Launchpad</title>
+    <link href="/stylesheets/bootstrap.min.css" rel="stylesheet" media="screen">
+    <link rel="stylesheet" href="/stylesheets/codemirror.css">
+  	<script src="/javascripts/jquery.min.js"></script>
+    <script src="/javascripts/bootstrap.min.js"></script>
+    <script src="/javascripts/codemirror.js"></script>
+    <script src="/javascripts/addon/edit/matchbrackets.js"></script>
+    <script src="/javascripts/addon/edit/continuecomment.js"></script>
+    <script src="/javascripts/addon/comment/comment.js"></script>
+    <script src="/javascripts/javascript.js"></script>
     <style type="text/css">
       .CodeMirror { border-top: 1px solid black; 
                     border-bottom: 1px solid black;} 
-    	div.row {margin-bottom:20px;}
+            
+     .screenshot { margin-right:10px;} 
+            
     </style>
   </head>
-	 <body>
+	 <body background=#eee>
 	  <div class="container">
 	    <div class="page-header">
 	      <h1 class="text-muted"><%=name%></h1>
 	      	<div style="margin-top:10px;padding:5px;position:relative;bottom:5px;">
-	        <button type="button" class="btn btn-default ">RUN</button>&nbsp;<button type="button" class="btn btn-default ">INSTALL</button>&nbsp;              
+	    		<% if (edit) { %>
+
+	        <a href="/pushandgo" class="btn btn-default ">RUN</a>
+
+
+	    		<% } else { %>
+
+					<a href="/edit/<%=git%>" class="btn btn-default ">EDIT</a>
+	        &nbsp;<a href="<%=git%>" class="btn btn-default ">VIEW SOURCE</a>
+
+	    		<% } %>
+
 	        </div>
 	    </div>
 	    <div class="row">
 	      <div class="col-md-12">
-	          <div class="pull-left">
-	            <a href="<%=homepage%>"><img src=<%=screenshot%>></a>
+	          <div class="pull-left btn btn-default screenshot">
+	            <a href="<%=homepage%>"><img border=1 src=<%=screenshot%>></a>
 	          </div>
 	      </div>
 	      <div class="col-md-12">
-	        <fieldset>
+	        <fieldset style="border-left:3px;">
 	          <label><%=description%></label>
 	          <div><%=readme%></div>
 	         </fieldset>
 	      </div>
 	    </div>
-	    <div class="row">
+	    <hr>
+	    <% if (edit) { %>
+	    <div class="row" id=push>
 	      <div class="col-md-12 tabbable">
 	        <ul id="sourceTabs" class="nav nav-tabs" data-tabs="tabs">
 	          <li class="active"><a href="#server" data-toggle="tab">Server</a></li>
@@ -67,18 +81,16 @@
 	    			</div>
 	    		</div>
 	  		</div>                    
-	  	</div>                    
-		</div>
-<!-- Bootstrap core JavaScript
-================================================== -->
-<!-- Placed at the end of the document so the pages load faster -->
-<script type="text/javascript" src="http://mbostock.github.com/d3/d3.js"></script>
-<!-- script type="text/javascript" src="/javascripts/gauge.js"></script-->
+	  	</div>
+	    <% } %>
 
+
+
+		</div>
+<% if (edit) { %>
 <script>
 
   var editor = [];
-
 
  	editor["server"] = CodeMirror.fromTextArea(document.getElementById("server_code"), {
     lineNumbers: true,
@@ -102,16 +114,34 @@
   });
 
 </script>
-
-  <script>
+<script>
   $(function () 
   {
-   //  $('#sourceTabs a:last').tab('show');
-    $('#sourceTabs').tab('');
+   	//$('#sourceTabs a:last').tab('show');
+   	$('#sourceTabs').tab('show');
   })
+</script>
+<% } %>
+
+<!--
+	 		<% if (!user) { %>
+			<a href="/">Home</a> | 
+			<a href="/github-login">Github Log In</a> | 
+		<% } else { %>
+			<a href="/github-account">Github Account</a> | 
+			<a href="/github-logout">Github Log Out</a>
+		<% } %>
 
 
+		 	<% if (!cfuser) { %>
+			 || 
+			<a href="/cloudfoundry-login">Cloudfoundry Log In</a> | 
+		<% } else { %>
+			<a href="/cloudfoundry-logout">Cloudfoundry Log Out</a>
+		<% } %>
+	
+			</p>
 
-	</script>
+-->
  </body>
 </html>
